@@ -31,6 +31,15 @@ class User(db.Model):
         self.email = email
         self.password = password
 
+'''
+# require users to login if not currently in a session.
+# uncomment once sessions are added
+@app.before_request
+def require_login():
+    allowed_routes = ['login','register']
+    if request.endpoint not in allowed_routes and 'email' not in session:
+        return redirect('/login')
+'''
 
 @app.route('/', methods=['POST', 'GET'])
 def index():
@@ -46,7 +55,6 @@ def index():
     return render_template('todos.html',title="Get It Done!", 
         tasks=tasks, completed_tasks=completed_tasks)
 
-
 @app.route('/delete-task', methods=['POST'])
 def delete_task():
 
@@ -57,6 +65,20 @@ def delete_task():
     db.session.commit()
 
     return redirect('/')
+
+@app.route('/blog')
+def view_blog():
+    #TODO - display all blog posts from newest to oldest
+    #TODO - only display blog posts that are owned by the user
+    return pass 
+
+@app.route('/newpost')
+def new_post():
+    #TODO - submit new blog post
+    #TODO - After submitted the app displays(redirect) the main blog page /blog to view the new post
+    #TODO - Blog must have title and body
+    return pass
+
 
 
 if __name__ == '__main__':
