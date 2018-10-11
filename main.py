@@ -41,7 +41,7 @@ def require_login():
         return redirect('/login')
 '''
 
-@app.route('/', methods=['POST', 'GET'])
+@app.route('/', methods=['POST'])
 def index():
 
     if request.method == 'POST':
@@ -55,29 +55,19 @@ def index():
     return render_template('todos.html',title="Get It Done!", 
         tasks=tasks, completed_tasks=completed_tasks)
 
-@app.route('/delete-task', methods=['POST'])
-def delete_task():
-
-    task_id = int(request.form['task-id'])
-    task = Task.query.get(task_id)
-    task.completed = True
-    db.session.add(task)
-    db.session.commit()
-
-    return redirect('/')
-
-@app.route('/blog')
+@app.route('/blog', methods=['GET'])
 def view_blog():
     #TODO - display all blog posts from newest to oldest
     #TODO - only display blog posts that are owned by the user
-    return pass 
+    blog_entries = Blog.query.all()
+    return render_template('blog.html',blog_view=blog_entries) 
 
-@app.route('/newpost')
-def new_post():
+@app.route('/newpost', methods=['POST'])
+def add_new_post():
     #TODO - submit new blog post
     #TODO - After submitted the app displays(redirect) the main blog page /blog to view the new post
     #TODO - Blog must have title and body, if false return newpost.html with helpful error message and any previously entered content
-    return pass
+    return render_template('newpost.html') 
 
 
 
