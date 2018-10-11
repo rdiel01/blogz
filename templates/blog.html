@@ -2,6 +2,17 @@
 
 {% block blog %}
 
-<h1>Welcome, {{html_username}}!</h1>
+<h1>Build a Blog</h1>
+<hr>
+{% for entry in blog_view %}
+    {% if entry.title %}
+        <h3>{{ entry.title }}</h3>
+        <p>{{ entry.blog }}</p>
+        <hr>
+    {% else %}
+        <p>No blog entries found :(</p>
+        <a href="/newpost">Click here to make your first blog :D</a>
+    {% endif %}
+{% endfor %}
 
 {% endblock %}
