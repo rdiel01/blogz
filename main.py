@@ -64,13 +64,13 @@ def view_blog():
     blog_entries = Blog.query.all()
     return render_template('blog.html',blog_view=blog_entries) 
 
-@app.route('/newpost', methods=['POST'])
+@app.route('/newpost', methods=['GET','POST'])
 def add_new_post():
     #TODO - submit new blog post
     #TODO - After submitted the app displays(redirect) the main blog page /blog to view the new post
     #TODO - Blog must have title and body, if false return newpost.html with helpful error message and any previously entered content
 
-    return view_blog() 
+    return render_template('newpost.html') 
 
 
 
