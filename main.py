@@ -25,7 +25,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(40), unique=True)
     password = db.Column(db.String(30))
-    blogs = db.relationship('Task', backref='owner')
+    blogs = db.relationship('Blog', backref='owner')
 
     def __init__(self, email, password):
         self.email = email
@@ -41,19 +41,21 @@ def require_login():
         return redirect('/login')
 '''
 
-@app.route('/', methods=['POST'])
-def index():
+#@app.route('/', methods=['POST'])
+#def index():
+'''
+if request.method == 'POST':
+    task_name = request.form['task']
+    new_task = Task(task_name)
+    db.session.add(new_task)
+    db.session.commit()
 
-    if request.method == 'POST':
-        task_name = request.form['task']
-        new_task = Task(task_name)
-        db.session.add(new_task)
-        db.session.commit()
-
-    tasks = Task.query.filter_by(completed=False).all()
-    completed_tasks = Task.query.filter_by(completed=True).all()
-    return render_template('todos.html',title="Get It Done!", 
-        tasks=tasks, completed_tasks=completed_tasks)
+tasks = Task.query.filter_by(completed=False).all()
+completed_tasks = Task.query.filter_by(completed=True).all()
+return render_template('todos.html',title="Get It Done!", 
+    tasks=tasks, completed_tasks=completed_tasks)
+'''
+#   return pass
 
 @app.route('/blog', methods=['GET'])
 def view_blog():
@@ -67,7 +69,8 @@ def add_new_post():
     #TODO - submit new blog post
     #TODO - After submitted the app displays(redirect) the main blog page /blog to view the new post
     #TODO - Blog must have title and body, if false return newpost.html with helpful error message and any previously entered content
-    return render_template('newpost.html') 
+
+    return view_blog() 
 
 
 
