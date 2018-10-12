@@ -6,7 +6,7 @@
 <hr>
 {% for entry in blog_view %}
     {% if entry.title %}
-        <h3><a href="/blog?id="{{entry.id}}>{{ entry.title }}</a></h3>
+        <h3><a href="/blog?id={{ entry.id }}" name="blog_id" value="{{ entry.id }}">{{ entry.title }}</a></h3>
         <p>{{ entry.body }}</p>
         <hr>
     {% else %}
