@@ -4,15 +4,18 @@
 
 <h1>Build a Blog</h1>
 <hr>
-{% for entry in blog_view %}
-    {% if entry.title %}
-        <h3><a href="/blog?id={{ entry.id }}" name="blog_id" value="{{ entry.id }}">{{ entry.title }}</a></h3>
-        <p>{{ entry.body }}</p>
-        <hr>
-    {% else %}
-        <p>No blog entries found :(</p>
-        <a href="/newpost">Click here to make your first blog :D</a>
-    {% endif %}
-{% endfor %}
+{% if a_blog %}
+    <h3>{{ a_blog.title }}</h3>
+    <p>{{ a_blog.body }}</p>
+{% elif blog_view %}
+    {% for entry in blog_view %}
+    <h3><a href="/blog?id={{ entry.id }}">{{ entry.title }}</a></h3>
+    <p>{{ entry.body }}</p>
+    <hr>
+    {% endfor %}
+{% else %}
+    <p>No blog entries found :(</p>
+    <a href="/newpost">Click here to make your first blog :D</a>
+{% endif %}
 
 {% endblock %}
