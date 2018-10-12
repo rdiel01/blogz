@@ -2,7 +2,7 @@
 
 {% block register %}
     <h1>Signup</h1>
-    <form action="/verification" method='POST'>
+    <form action="/register" method='POST'>
         <label>Username</label>
             <input type='text' name="typed_username" value={{html_username}}>
         {% if html_username_error %}
