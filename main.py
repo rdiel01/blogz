@@ -57,16 +57,27 @@ return render_template('todos.html',title="Get It Done!",
 '''
 #   return pass
 
-@app.route('/blog', methods=['GET'])
-def view_blog():
+@app.route('/')
+def all_blogs():
     #TODO - display all blog posts from newest to oldest
     #TODO - only display blog posts that are owned by the user
-    blog_id=request.form['blog_id']
-    if request.method == 'GET' and blog_post:
-        blog_post = Blog.query.filter_by(id=blog_id).first()    
-        return render_template('blog.html',blog_view=blog_post)
-    blog_entries = Blog.query.all()
-    return render_template('blog.html',blog_view=blog_entries) 
+    blog_posts = Blog.query.all()
+    return render_template('blog.html',blog_view=blog_posts)
+
+@app.route('/blog', methods=['GET'])
+def a_blog():
+    #TODO - display all blog posts from newest to oldest
+    #TODO - only display blog posts that are owned by the user
+    blog_id=request.args.get('id')
+    if request.method == 'GET' and blog_id:
+        blog_post = Blog.query.filter_by(id=blog_id).first()   
+        return render_template('blog.html',a_blog=blog_post)
+    else:
+        return '<p>Oops</p>'
+    #else:
+    #blog_entries = Blog.query.all()
+    #return render_template('blog.html',blog_view=blog_entries)
+
 
 @app.route('/newpost', methods=['GET','POST'])
 def add_new_post():
@@ -79,8 +90,8 @@ def add_new_post():
         new_blog = Blog(blog_title,blog_body,1)
         db.session.add(new_blog)
         db.session.commit()
-        blog_entries = Blog.query.filter_by(title=blog_title).all()
-        return render_template('blog.html',blog_view=blog_entries)
+        blog_post = Blog.query.filter_by(title=blog_title).first()
+        return render_template('blog.html',a_blog=blog_post)
 
     return render_template('newpost.html') 
 
