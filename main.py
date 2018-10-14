@@ -31,6 +31,18 @@ class User(db.Model):
         self.email = email
         self.password = password
 
+def blank_title(title):
+    if not title:
+        return True
+    else:
+        return False
+
+def blank_body(body):
+    if not body:
+        return True
+    else:
+        return False
+
 '''
 # require users to login if not currently in a session.
 # uncomment once sessions are added
@@ -57,13 +69,13 @@ return render_template('todos.html',title="Get It Done!",
 '''
 #   return pass
 
-@app.route('/')
+@app.route('/blog')
 def all_blogs():
     #TODO - display all blog posts from newest to oldest
     #TODO - only display blog posts that are owned by the user
     blog_posts = Blog.query.all()
     return render_template('blog.html',blog_view=blog_posts)
-
+'''
 @app.route('/blog', methods=['GET'])
 def a_blog():
     #TODO - display all blog posts from newest to oldest
@@ -77,7 +89,7 @@ def a_blog():
     #else:
     #blog_entries = Blog.query.all()
     #return render_template('blog.html',blog_view=blog_entries)
-
+'''
 
 @app.route('/newpost', methods=['GET','POST'])
 def add_new_post():
@@ -87,6 +99,8 @@ def add_new_post():
     if request.method == 'POST':
         blog_title = request.form['user_title']
         blog_body = request.form['user_body']
+        if blank_title(blog_title) or blank_body(blog_body):
+            return render_template('newpost.html',blank_title=blank_title(blog_title),blank_body=blank_body(blog_body))
         new_blog = Blog(blog_title,blog_body,1)
         db.session.add(new_blog)
         db.session.commit()
