@@ -7,9 +7,15 @@
 <form action="/newpost" method="POST">
     <label>Title</label>
     <input type="text" name="user_title">
+    {% if blank_title %}
+        <p>Please enter a title for your blog</p>
+    {% endif %}
     <br>
     <label>Blog entry</label>
     <textarea rows="10" cols="75" name="user_body"></textarea>
+    {% if blank_body %}
+        <p>Please enter some text for your blog</p>
+    {% endif %}
     <br>
 <input type="submit" value="Submit Post">
 </form> 
