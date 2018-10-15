@@ -31,17 +31,17 @@ class User(db.Model):
         self.email = email
         self.password = password
 
-def blank_title(title):
-    if not title:
+def blank(string):
+    """
+    Blank field check
+    ```
+    Return True if string is empty
+    """
+    if not string:
         return True
     else:
         return False
 
-def blank_body(body):
-    if not body:
-        return True
-    else:
-        return False
 
 '''
 # require users to login if not currently in a session.
@@ -59,31 +59,36 @@ def to_blog():
 
 @app.route('/blog', methods=['GET'])
 def a_blog():
-    #TODO - display all blog posts from newest to oldest
+
     #TODO - only display blog posts that are owned by the user
     if request.args.get('id'):
+        #if id has an arg we need to display the single blog that the user selected
         blog_id=request.args.get('id')
-        blog_post = Blog.query.filter_by(id=blog_id).first()   
+        #assign the id argument to a variable
+        blog_post = Blog.query.filter_by(id=blog_id).first()
+        #run a query filtering by the id
         return render_template('blog.html',a_blog=blog_post)
+        #render blog template with the blog object
     else:
+        #if an id was not selected display all blogs in ascending order
         blog_posts = Blog.query.order_by(-Blog.id).all()
+        #run a query ordering by blog.id in reverse order (newest to oldest)
         return render_template('blog.html',blog_view=blog_posts)
-    #else:
-    #blog_entries = Blog.query.all()
-    #return render_template('blog.html',blog_view=blog_entries)
-
+        #render blog template with all blog objects
 
 @app.route('/newpost', methods=['GET','POST'])
 def add_new_post():
-    #TODO - submit new blog post
-    #TODO - After submitted the app displays(redirect) the main blog page /blog to view the new post
-    #TODO - Blog must have title and body, if false return newpost.html with helpful error message and any previously entered content
     if request.method == 'POST':
         blog_title = request.form['user_title']
+        #assign the user's blog title to a variable
         blog_body = request.form['user_body']
-        if blank_title(blog_title) or blank_body(blog_body):
-            return render_template('newpost.html',blank_title=blank_title(blog_title),blank_body=blank_body(blog_body))
+        #assign the user's blog body to a variable
+        if blank(blog_title) or blank(blog_body):
+            #if either the submitted blog title or body are blank
+            return render_template('newpost.html',blank_title=blank(blog_title),blank_body=blank(blog_body),previous_title=blog_title,previous_body=blog_body)
+            #render newpost template with error flags for jinja2 to evaluate
         new_blog = Blog(blog_title,blog_body,1)
+        #assign new object with blog title, blog body and user 1
         db.session.add(new_blog)
         db.session.commit()
         blog_post = Blog.query.filter_by(title=blog_title).first()
