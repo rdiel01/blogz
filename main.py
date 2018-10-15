@@ -66,7 +66,7 @@ def a_blog():
         blog_post = Blog.query.filter_by(id=blog_id).first()   
         return render_template('blog.html',a_blog=blog_post)
     else:
-        blog_posts = Blog.query.all()
+        blog_posts = Blog.query.order_by(-Blog.id).all()
         return render_template('blog.html',blog_view=blog_posts)
     #else:
     #blog_entries = Blog.query.all()
@@ -82,7 +82,7 @@ def add_new_post():
         blog_title = request.form['user_title']
         blog_body = request.form['user_body']
         if blank_title(blog_title) or blank_body(blog_body):
-            return render_template('newpost.html',blank_title=blank_title(blog_title),blank_body=blank_body(blog_body),previous_title=blog_title,previous_body=blog_body)
+            return render_template('newpost.html',blank_title=blank_title(blog_title),blank_body=blank_body(blog_body))
         new_blog = Blog(blog_title,blog_body,1)
         db.session.add(new_blog)
         db.session.commit()
