@@ -53,43 +53,25 @@ def require_login():
         return redirect('/login')
 '''
 
-#@app.route('/', methods=['POST'])
-#def index():
-'''
-if request.method == 'POST':
-    task_name = request.form['task']
-    new_task = Task(task_name)
-    db.session.add(new_task)
-    db.session.commit()
+@app.route('/')
+def to_blog():
+    return redirect ('/blog', code=302)
 
-tasks = Task.query.filter_by(completed=False).all()
-completed_tasks = Task.query.filter_by(completed=True).all()
-return render_template('todos.html',title="Get It Done!", 
-    tasks=tasks, completed_tasks=completed_tasks)
-'''
-#   return pass
-
-@app.route('/blog')
-def all_blogs():
-    #TODO - display all blog posts from newest to oldest
-    #TODO - only display blog posts that are owned by the user
-    blog_posts = Blog.query.all()
-    return render_template('blog.html',blog_view=blog_posts)
-'''
 @app.route('/blog', methods=['GET'])
 def a_blog():
     #TODO - display all blog posts from newest to oldest
     #TODO - only display blog posts that are owned by the user
-    blog_id=request.args.get('id')
-    if request.method == 'GET' and blog_id:
+    if request.args.get('id'):
+        blog_id=request.args.get('id')
         blog_post = Blog.query.filter_by(id=blog_id).first()   
         return render_template('blog.html',a_blog=blog_post)
     else:
-        return '<p>Oops</p>'
+        blog_posts = Blog.query.all()
+        return render_template('blog.html',blog_view=blog_posts)
     #else:
     #blog_entries = Blog.query.all()
     #return render_template('blog.html',blog_view=blog_entries)
-'''
+
 
 @app.route('/newpost', methods=['GET','POST'])
 def add_new_post():
@@ -100,7 +82,7 @@ def add_new_post():
         blog_title = request.form['user_title']
         blog_body = request.form['user_body']
         if blank_title(blog_title) or blank_body(blog_body):
-            return render_template('newpost.html',blank_title=blank_title(blog_title),blank_body=blank_body(blog_body))
+            return render_template('newpost.html',blank_title=blank_title(blog_title),blank_body=blank_body(blog_body),previous_title=blog_title,previous_body=blog_body)
         new_blog = Blog(blog_title,blog_body,1)
         db.session.add(new_blog)
         db.session.commit()
