@@ -55,7 +55,7 @@ def blank(string):
 # uncomment once sessions are added
 @app.before_request
 def require_login():
-    allowed_routes = ['login','signup']
+    allowed_routes = ['login','signup','blog','index']
     if request.endpoint not in allowed_routes and 'email' not in session:
         return redirect('/login')
 '''
