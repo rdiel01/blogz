@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect, render_template
+from flask import Flask, request, redirect, render_template, session, flash
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
@@ -7,8 +7,6 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://build-a-blog:**B1r2y3B$
 app.config['SQLALCHEMY_ECHO'] = True
 db = SQLAlchemy(app)
 
-
-#TODO: add the following templates: signup.html, login.html, and index.html
 #TODO: add the following route handler functions: signup, login, and index
 #TODO:add a singleUser.html template that will be used to display only the blogs associated with a single given author.
     #It will be used when we dynamically generate a page using a GET request with a user query parameter on the /blog route
@@ -49,7 +47,71 @@ def blank(string):
     else:
         return False
 
+def error(string):
+    """
+    checks is a string has any spaces in it and if it is within 3-20 chars long
+    ```
+    string, a string
+    """
+    if string and ' ' not in string and ((len(string) > 3 and len(string) < 20)):
+        return False
+    else:
+        return True
 
+def password_compare(pass_1,pass_2):
+    """
+    checks if password value matches verify password value
+    ```
+    pass_1, a string
+    pass_2, a string
+    """
+    if pass_1 != pass_2:
+        return False
+    else:
+        return True
+
+@app.route("/signup", methods=["POST"])
+def verification():
+    """
+    checks if username, password and email are legit.
+    ```
+    username, must be 3-20 char long with no spaces
+    password, must be 3-20 char long with no spaces
+     
+     - User enters new, valid username, a valid password, and verifies
+      password correctly and is redirected to the '/newpost' page with
+      their username being stored in a session.
+    - User leaves any of the username, password, or verify fields blank and gets
+      an error message that one or more fields are invalid.
+    - User enters a username that already exists and gets an error message that username already exists.
+    - User enters different strings into the password and verify fields and
+      gets an error message that the passwords do not match.
+    - User enters a password or username less than 3 characters long and gets either
+      an invalid username or an invalid password message.
+    """
+    username = ""
+    password = ""
+    username_error = error(request.form['typed_username'])
+    password_error = error(request.form['typed_password'])
+    
+    matching_passwords = password_compare(request.form['typed_password'],request.form['verify_password'])
+    #check username and assign username if pass
+    if not username_error:
+        username = request.form['typed_username']
+    #check passwords and assign password if pass
+    if not password_error and matching_passwords:
+        password=request.form['typed_password']
+    #check email and assign email if pass
+    existing_user = User.query.filter_by(email=username).first()
+
+    if not existing_user and not username_error and not password_error and matching_passwords:
+        new_user = User(username,password)
+        db.session.add(new_user)
+        db.session.commit()
+        session['email'] = username
+        return render_template("newpost.html",html_username=username)
+    else:
+        return render_template("signup.html",html_username=username,html_email=email,html_username_error=username_error,html_password_error=password_error,html_password_verification_error=matching_passwords,html_email_error=email_error)
 '''
 # require users to login if not currently in a session.
 # uncomment once sessions are added
@@ -71,21 +133,6 @@ def login():
     - User does not have an account and clicks "Create Account" and is directed to the /signup page.
     '''
     pass
-
-@app.route('/signup')
-def signup():
-    '''
-    - User enters new, valid username, a valid password, and verifies
-      password correctly and is redirected to the '/newpost' page with
-      their username being stored in a session.
-    - User leaves any of the username, password, or verify fields blank and gets
-      an error message that one or more fields are invalid.
-    - User enters a username that already exists and gets an error message that username already exists.
-    - User enters different strings into the password and verify fields and
-      gets an error message that the passwords do not match.
-    - User enters a password or username less than 3 characters long and gets either
-      an invalid username or an invalid password message.
-    '''
 
 @app.route('/')
 def to_blog():
