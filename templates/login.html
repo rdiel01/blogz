@@ -1,3 +1,5 @@
+<!-- I can add error messages into the HTML and use flash messages as a logic gate to toggle the errors. Isthat worth?-->
+
 {% extends 'base.html' %}
 {% block login %}
 <form>
@@ -5,7 +7,7 @@
     {% with html_username = get_flashed_messages(category_filter=['html_username']) %}
             <input type='text' name="html_user" value={{html_username[0]}}>
     {% endwith %}
-    {% with invalid_entry = get_flashed_messages(category_filter=['user_exists'])%}
+    {% with invalid_entry = get_flashed_messages(category_filter=['invalid_user'])%}
     {% if invalid_entry %}
         <p class='inline error'>{{invalid_entry[0]}}</p>
     {% endif %}
@@ -13,7 +15,7 @@
     <br>
     <label>Password:</label>
     <input type="text" name="html_pw">
-    {% with invalid_entry = get_flashed_messages(category_filter=['user_exists'])%}
+    {% with invalid_entry = get_flashed_messages(category_filter=['invalid_password'])%}
     {% if invalid_entry %}
         <p class='inline error'>{{invalid_entry[0]}}</p>
     {% endif %}
