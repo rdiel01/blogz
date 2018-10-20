@@ -145,7 +145,7 @@ def login():
       to the /login page with a message that this username does not exist.
     - User does not have an account and clicks "Create Account" and is directed to the /signup page.
     '''
-    pass
+    return render_template('login.html')
 
 @app.route('/index')
 def index():
