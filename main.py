@@ -24,6 +24,18 @@ class Blog(db.Model):
         self.body = body
         self.owner_id = owner
 
+    def not_blank(string):
+        """
+        Blank field check
+        ```
+        Return False if string is empty
+        """
+        if string or string.replace(' ','') != '':
+            return True
+        else:
+            return flash('The {0} field is empty','blog_error')
+
+
 class User(db.Model):
     
     id = db.Column(db.Integer, primary_key=True)
@@ -34,16 +46,44 @@ class User(db.Model):
     def __init__(self, email, password):
         self.email = email
         self.password = password
-    
+
+    def valid_username(self):
+        """
+        checks if a string has any spaces in it and if it is within 3-20 chars long
+        returns False if none apply
+        ```
+        string, a string
+        """
+        print('username check')
+        if self.email and ' ' not in self.email and ((len(self.email) > 3 and len(self.email) < 20)):
+            return True
+        else:
+            flash('Invalid username. Must be 3-20 characters long and contain no spaces.','invalid_username')
+
+    def valid_password(self):
+        """
+        checks if a string has any spaces in it and if it is within 3-20 chars long
+        returns False if none apply
+        ```
+        string, a string
+        """
+        print('password check')
+        if self.password and ' ' not in self.password and ((len(self.password) > 3 and len(self.password) < 20)):
+            return True
+        else:
+            flash('Invalid password. Must be 3-20 characters long and contain no spaces.','invalid_password')
+            
+
     def is_unique(self):
         """
         Check if username is unique and not already in database
         username, string that is between 3-20 characters with no spaces
         """
-        if User.query.filter_by(email=self.email).first():
+        print('unique check')
+        if not User.query.filter_by(email=self.email).first():
             return True
         else:
-            return flash('That username already exists.','user_exists')
+            flash('Username already exists.','user_exists')
 
     def matching_passwords(self, other_pass):
         """
@@ -52,78 +92,39 @@ class User(db.Model):
         pass_1, a string
         pass_2, a string
         """
+        print('match check')
         if self.password == other_pass:
             return True
         else:
-            return flash('Your passwords do not match','different_passwords')
+            return flash('Passwords do not match','different_passwords')
 
-def blank(string):
-    """
-    Blank field check
-    ```
-    Return True if string is empty
-    """
-    if not string:
-        return True
-    else:
-        return False
 
-def error(string):
-    """
-    checks is a string has any spaces in it and if it is within 3-20 chars long
-    ```
-    string, a string
-    """
-    if string and ' ' not in string and ((len(string) > 3 and len(string) < 20)):
-        return False
-    else:
-        return True
-   
 
-@app.route("/signup", methods=["POST"])
+@app.route("/signup", methods=["POST","GET"])
 def verification():
     """
     checks if username, password and email are legit.
     ```
     username, must be 3-20 char long with no spaces
     password, must be 3-20 char long with no spaces
-     
-     - User enters new, valid username, a valid password, and verifies
-      password correctly and is redirected to the '/newpost' page with
-      their username being stored in a session.
-    - User leaves any of the username, password, or verify fields blank and gets
-      an error message that one or more fields are invalid.
-    - User enters a username that already exists and gets an error message that username already exists.
-    - User enters different strings into the password and verify fields and
-      gets an error message that the passwords do not match.
-    - User enters a password or username less than 3 characters long and gets either
-      an invalid username or an invalid password message.
     """
-    username = ""
-    password = ""
-    username_error = error(request.form['typed_username'])
-    password_error = error(request.form['typed_password'])
-    
-    pass1 = request.form['pass1']
-    pass2 = request.form['pass2']
-    #check username and assign username if pass
-    if not username_error:
-        username = request.form['typed_username']
-    #check passwords and assign password if pass
-    if not password_error and matching_passwords:
-        password=request.form['typed_password']
-    #check email and assign email if pass
-    submitted_user = User(username,pass1)
+    if request.method == "POST":
+        submitted_user = User(request.form['typed_username'],request.form['pass1'])
 
-    if submitted_user.is_unique() and submitted_user.matching_passwords(pass1,pass2):
-
-        new_user = User(username,password)
-        db.session.add(new_user)
-        db.session.commit()
-        session['email'] = username
-        return render_template("newpost.html",html_username=username)
-    else:
-        return render_template("signup.html",html_username=username,html_email=email,html_username_error=username_error,html_password_error=password_error,html_password_verification_error=matching_passwords,html_email_error=email_error)
+        if  submitted_user.valid_password() and submitted_user.is_unique() and submitted_user.valid_username() and submitted_user.matching_passwords(request.form['pass2']):
+            db.session.add(submitted_user)
+            db.session.commit()
+            session['email'] = submitted_user.email
+            print(session['email'])
+            return render_template("newpost.html")
+        elif submitted_user.valid_username() and submitted_user.is_unique():
+            flash(submitted_user.email,'html_username')
+            submitted_user = None
+            return render_template("signup.html")
+        else:
+            return render_template("signup.html")
+    elif request.method == "GET":
+        return render_template("signup.html")
 '''
 # require users to login if not currently in a session.
 # uncomment once sessions are added
