@@ -2,16 +2,15 @@ from flask import Flask, request, redirect, render_template, session, flash
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
+app.secret_key = 'dakey'
 app.config['DEBUG'] = True
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://build-a-blog:**B1r2y3B$$@localhost:8889/build-a-blog'
 app.config['SQLALCHEMY_ECHO'] = True
 db = SQLAlchemy(app)
 
-#TODO: add the following route handler functions: signup, login, and index
 #TODO:add a singleUser.html template that will be used to display only the blogs associated with a single given author.
     #It will be used when we dynamically generate a page using a GET request with a user query parameter on the /blog route
 #TODO: We'll have a logout function that handles a POST request to /logout and redirects the user to /blog after deleting the username from the session
-#TODO: 
 
 class Blog(db.Model):
 
@@ -35,6 +34,28 @@ class User(db.Model):
     def __init__(self, email, password):
         self.email = email
         self.password = password
+    
+    def is_unique(self):
+        """
+        Check if username is unique and not already in database
+        username, string that is between 3-20 characters with no spaces
+        """
+        if User.query.filter_by(email=self.email).first():
+            return True
+        else:
+            return flash('That username already exists.','user_exists')
+
+    def matching_passwords(self, other_pass):
+        """
+        checks if password value matches verify password value
+        ```
+        pass_1, a string
+        pass_2, a string
+        """
+        if self.password == other_pass:
+            return True
+        else:
+            return flash('Your passwords do not match','different_passwords')
 
 def blank(string):
     """
@@ -57,18 +78,7 @@ def error(string):
         return False
     else:
         return True
-
-def password_compare(pass_1,pass_2):
-    """
-    checks if password value matches verify password value
-    ```
-    pass_1, a string
-    pass_2, a string
-    """
-    if pass_1 != pass_2:
-        return False
-    else:
-        return True
+   
 
 @app.route("/signup", methods=["POST"])
 def verification():
@@ -94,7 +104,8 @@ def verification():
     username_error = error(request.form['typed_username'])
     password_error = error(request.form['typed_password'])
     
-    matching_passwords = password_compare(request.form['typed_password'],request.form['verify_password'])
+    pass1 = request.form['pass1']
+    pass2 = request.form['pass2']
     #check username and assign username if pass
     if not username_error:
         username = request.form['typed_username']
@@ -102,9 +113,10 @@ def verification():
     if not password_error and matching_passwords:
         password=request.form['typed_password']
     #check email and assign email if pass
-    existing_user = User.query.filter_by(email=username).first()
+    submitted_user = User(username,pass1)
 
-    if not existing_user and not username_error and not password_error and matching_passwords:
+    if submitted_user.is_unique() and submitted_user.matching_passwords(pass1,pass2):
+
         new_user = User(username,password)
         db.session.add(new_user)
         db.session.commit()
@@ -132,6 +144,10 @@ def login():
       to the /login page with a message that this username does not exist.
     - User does not have an account and clicks "Create Account" and is directed to the /signup page.
     '''
+    pass
+
+@app.route('/index')
+def index():
     pass
 
 @app.route('/')
@@ -177,6 +193,10 @@ def add_new_post():
 
     return render_template('newpost.html') 
 
+@app.route('/test')
+def tests():
+    test_user = User
+    return render_template('test.html')
 
 
 if __name__ == '__main__':
