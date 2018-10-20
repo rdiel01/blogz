@@ -4,32 +4,38 @@
     <h1>Signup</h1>
     <form action="/signup" method='POST'>
         <label>Username</label>
-            <input type='text' name="typed_username" value={{html_username}}>
-        {% if html_username_error %}
-            <p class='inline error'>Username must be 3-20 characters long with no spaces.</p>
-        {% endif %}
+        {% with html_username = get_flashed_messages(category_filter=['html_username']) %}
+            <input type='text' name="typed_username" value={{html_username[0]}}>
+        {% endwith %}
+        {% with invalid_entry = get_flashed_messages(category_filter=['user_exists'])%}
+            {% if invalid_entry %}
+                <p class='inline error'>{{invalid_entry[0]}}</p>
+            {% endif %}
+        {% endwith %}
+        {% with invalid_entry = get_flashed_messages(category_filter=['invalid_username'])%}
+            {% if invalid_entry %}
+                <p class='inline error'>{{invalid_entry[0]}}</p>
+            {% endif %}
+        {% endwith %}
         <br>
 
         <label>Password</label>
             <input type='password' name="pass1">
-        {% if html_password_error %}
-            <p class='inline error'>Password must be 3-20 characters long with no spaces.</p>
-        {% endif %}    
-            <br>
+        {% with invalid_entry = get_flashed_messages(category_filter=['invalid_password'])%}
+            {% if invalid_entry %}
+                <p class='inline error'>{{invalid_entry[0]}}</p>
+            {% endif %}
+        {% endwith %}
+         <br>
 
         <label>Verify Password</label>
             <input type='password' name="pass2">
-        {% if html_password_verification_error %}
-            <p class='inline error'>Passwords do not match.</p>
-        {% endif %}    
-            <br>
-
-        <label>Email (optional)</label>
-            <input type='text' name="typed_email" value={{html_email}}>
-        {% if html_email_error %}
-            <p class='inline error'>That is not a valid email.</p>
-        {% endif %}
-            <br>
+        {% with different_passwords = get_flashed_messages(category_filter=['different_passwords'])%}
+            {% if different_passwords %}
+                <p class='inline error'>{{different_passwords[0]}}</p>
+            {% endif %}
+        {% endwith %}   
+        <br>
 
             <input type='submit' value='Submit Query'>
     </form>
