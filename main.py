@@ -74,16 +74,19 @@ class User(db.Model):
             flash('Invalid password. Must be 3-20 characters long and contain no spaces.','invalid_password')
             
 
-    def is_unique(self):
+    def already_exists(self):
         """
         Check if username is unique and not already in database
         username, string that is between 3-20 characters with no spaces
         """
         print('unique check!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@')
-        if not User.query.filter_by(email=self.email).first():
+        if User.query.filter_by(email=self.email).first():
+            flash('Username already exists.','user_exists')
             return True
         else:
-            flash('Username already exists.','user_exists')
+            flash('User does not exist.','no_user')
+            flash(self.email,'html_username')
+            return False
 
     def matching_passwords(self, other_pass):
         """
@@ -96,7 +99,10 @@ class User(db.Model):
         if self.password == other_pass:
             return True
         else:
-            return flash('Passwords do not match','different_passwords')
+            flash(self.email,'html_username')
+            flash ('Incorrect password.','invalid_password')
+            flash('Passwords do not match','different_passwords')
+            return False
 
 
 
@@ -111,14 +117,13 @@ def verification():
     if request.method == "POST":
         submitted_user = User(request.form['typed_username'],request.form['pass1'])
 
-        if  submitted_user.valid_password() and submitted_user.is_unique() and submitted_user.valid_username() and submitted_user.matching_passwords(request.form['pass2']):
+        if  submitted_user.valid_password() and not submitted_user.already_exists() and submitted_user.valid_username() and submitted_user.matching_passwords(request.form['pass2']):
             db.session.add(submitted_user)
             db.session.commit()
             session['email'] = submitted_user.email
             print(session['email'])
             return render_template("newpost.html")
-        elif submitted_user.valid_username() and submitted_user.is_unique():
-            flash(submitted_user.email,'html_username')
+        elif submitted_user.valid_username() and not submitted_user.already_exists():            
             submitted_user = None
             return render_template("signup.html")
         else:
@@ -147,15 +152,14 @@ def login():
     '''
     if request.method == 'POST':
         submitted_user = User(request.form['html_user'],request.form['html_pw'])
-        print(not submitted_user.is_unique())
-        if not submitted_user.is_unique():
+        if submitted_user.already_exists():
             print('USER!!!11!!!!!!!!!!!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@@!@!@!@!@!@!@!@!@!@!@!@!')
             user = User.query.filter_by(email=submitted_user.email).first()
-            if submitted_user.password == user.password:
+            if user.matching_passwords(submitted_user.password):
                 print('PASS!!!11!!!!!!!!!!!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@@!@!@!@!@!@!@!@!@!@!@!@!')
                 session['email'] = submitted_user.email
-                flash('Logged in')
-                #add user welcome
+                flash('Logged in as {0}.'.format(submitted_user.email),'login_good')
+                submitted_user=None
                 return render_template('newpost.html')
     print('firstFAIL!!!11!!!!!!!!!!!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@@!@!@!@!@!@!@!@!@!@!@!@!')
     submitted_user = None
