@@ -11,14 +11,14 @@
         <br>
 
         <label>Password</label>
-            <input type='password' name="typed_password">
+            <input type='password' name="pass1">
         {% if html_password_error %}
             <p class='inline error'>Password must be 3-20 characters long with no spaces.</p>
         {% endif %}    
             <br>
 
         <label>Verify Password</label>
-            <input type='password' name="verify_password">
+            <input type='password' name="pass2">
         {% if html_password_verification_error %}
             <p class='inline error'>Passwords do not match.</p>
         {% endif %}    
