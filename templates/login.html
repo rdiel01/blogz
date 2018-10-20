@@ -7,9 +7,9 @@
     {% with html_username = get_flashed_messages(category_filter=['html_username']) %}
             <input type='text' name="html_user" value={{html_username[0]}}>
     {% endwith %}
-    {% with invalid_entry = get_flashed_messages(category_filter=['user_exists'])%}
+    {% with invalid_entry = get_flashed_messages(category_filter=['no_user'])%}
     {% if invalid_entry %}
-        <p class='inline error'>User does not exist. Create a new account <a href="/signup">here!</a></p>
+        <p class='inline error'>{{ invalid_entry[0] }}</p>
     {% endif %}
     {% endwith %}
     <br>
