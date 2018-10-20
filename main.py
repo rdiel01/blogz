@@ -54,7 +54,6 @@ class User(db.Model):
         ```
         string, a string
         """
-        print('username check!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!')
         if self.email and ' ' not in self.email and ((len(self.email) > 3 and len(self.email) < 20)):
             return True
         else:
@@ -67,7 +66,6 @@ class User(db.Model):
         ```
         string, a string
         """
-        print('password check!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!')
         if self.password and ' ' not in self.password and ((len(self.password) > 3 and len(self.password) < 20)):
             return True
         else:
@@ -79,7 +77,6 @@ class User(db.Model):
         Check if username is unique and not already in database
         username, string that is between 3-20 characters with no spaces
         """
-        print('unique check!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@')
         if User.query.filter_by(email=self.email).first():
             flash('Username already exists.','user_exists')
             return True
@@ -95,7 +92,6 @@ class User(db.Model):
         pass_1, a string
         pass_2, a string
         """
-        print('match check!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!')
         if self.password == other_pass:
             return True
         else:
@@ -104,10 +100,14 @@ class User(db.Model):
             flash('Passwords do not match','different_passwords')
             return False
 
-
+@app.before_request
+def require_login():
+    allowed_routes = ['login','signup','blog','index']
+    if request.endpoint not in allowed_routes and 'email' not in session:
+        return redirect('/login')
 
 @app.route("/signup", methods=["POST","GET"])
-def verification():
+def signup():
     """
     checks if username, password and email are legit.
     ```
@@ -130,45 +130,29 @@ def verification():
             return render_template("signup.html")
     elif request.method == "GET":
         return render_template("signup.html")
-'''
-# require users to login if not currently in a session.
-# uncomment once sessions are added
-@app.before_request
-def require_login():
-    allowed_routes = ['login','signup','blog','index']
-    if request.endpoint not in allowed_routes and 'email' not in session:
-        return redirect('/login')
-'''
+
 @app.route('/login', methods =['POST','GET'])
 def login():
-    '''
-    - User enters a username that is stored in the database with the correct password and is 
-      redirected to the /newpost page with their username being stored in a session.
-    - User enters a username that is stored in the database with an incorrect password and is
-      redirected to the /login page with a message that their password is incorrect.
-    - User tries to login with a username that is not stored in the database and is redirected
-      to the /login page with a message that this username does not exist.
-    - User does not have an account and clicks "Create Account" and is directed to the /signup page.
-    '''
     if request.method == 'POST':
         submitted_user = User(request.form['html_user'],request.form['html_pw'])
         if submitted_user.already_exists():
-            print('USER!!!11!!!!!!!!!!!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@@!@!@!@!@!@!@!@!@!@!@!@!')
             user = User.query.filter_by(email=submitted_user.email).first()
             if user.matching_passwords(submitted_user.password):
-                print('PASS!!!11!!!!!!!!!!!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@@!@!@!@!@!@!@!@!@!@!@!@!')
                 session['email'] = submitted_user.email
                 flash('Logged in as {0}.'.format(submitted_user.email),'login_good')
                 submitted_user=None
                 return render_template('newpost.html')
-    print('firstFAIL!!!11!!!!!!!!!!!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@@!@!@!@!@!@!@!@!@!@!@!@!')
     submitted_user = None
-    print('secondFAIL!!!11!!!!!!!!!!!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@@!@!@!@!@!@!@!@!@!@!@!@!')
     return render_template('login.html')
 
 @app.route('/index')
 def index():
     pass
+
+@app.route('/logout')
+def logout():
+    del session['email']
+    return redirect('/blog', code=301)
 
 @app.route('/')
 def to_blog():
