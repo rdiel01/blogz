@@ -152,16 +152,25 @@ def index():
 @app.route('/logout')
 def logout():
     del session['email']
-    return redirect('/blog', code=301)
+    #test the demo site to see where it is taking the user on logout
+    return redirect('/', code=301)
 
 @app.route('/')
-def to_blog():
-    return redirect ('/blog', code=302)
-
+def all_blog_home():
+    all_users = User.query.order_by(User.email).all() 
+    return render_template('blog.html',user_view=all_users)
+    
 @app.route('/blog', methods=['GET'])
 def a_blog():
 
     #TODO - only display blog posts that are owned by the user
+    if request.args.get('user'):
+        #if id has user as arg we need to display all the post of that user
+        user=User.query.filter_by(email=request.args.get('user')).one()
+        #assign the id argument to a variable
+        users_posts = Blog.query.filter_by(owner_id=user.id).order_by(-Blog.id).all()
+        #run a query filtering by the id
+        return render_template('blog.html',users_post_view=users_posts,user=user.email)
     if request.args.get('id'):
         #if id has an arg we need to display the single blog that the user selected
         blog_id=request.args.get('id')
