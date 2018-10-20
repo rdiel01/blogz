@@ -28,6 +28,11 @@
     <a href="/login">login</a>
     <a href="/logout">logout</a>
     </span>
+    {% with message = get_flashed_messages(category_filter=['login_good'])%}
+        {% if message %}
+            <p> {{ message[0]}} </p>
+        {% endif %}
+    {% endwith %}
     {% block signup %}
     {% endblock %}
 
