@@ -54,7 +54,7 @@ class User(db.Model):
         ```
         string, a string
         """
-        print('username check')
+        print('username check!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!')
         if self.email and ' ' not in self.email and ((len(self.email) > 3 and len(self.email) < 20)):
             return True
         else:
@@ -67,7 +67,7 @@ class User(db.Model):
         ```
         string, a string
         """
-        print('password check')
+        print('password check!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!')
         if self.password and ' ' not in self.password and ((len(self.password) > 3 and len(self.password) < 20)):
             return True
         else:
@@ -79,7 +79,7 @@ class User(db.Model):
         Check if username is unique and not already in database
         username, string that is between 3-20 characters with no spaces
         """
-        print('unique check')
+        print('unique check!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@')
         if not User.query.filter_by(email=self.email).first():
             return True
         else:
@@ -92,7 +92,7 @@ class User(db.Model):
         pass_1, a string
         pass_2, a string
         """
-        print('match check')
+        print('match check!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!')
         if self.password == other_pass:
             return True
         else:
@@ -134,7 +134,7 @@ def require_login():
     if request.endpoint not in allowed_routes and 'email' not in session:
         return redirect('/login')
 '''
-@app.route('/login')
+@app.route('/login', methods =['POST','GET'])
 def login():
     '''
     - User enters a username that is stored in the database with the correct password and is 
@@ -145,6 +145,21 @@ def login():
       to the /login page with a message that this username does not exist.
     - User does not have an account and clicks "Create Account" and is directed to the /signup page.
     '''
+    if request.method == 'POST':
+        submitted_user = User(request.form['html_user'],request.form['html_pw'])
+        print(not submitted_user.is_unique())
+        if not submitted_user.is_unique():
+            print('USER!!!11!!!!!!!!!!!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@@!@!@!@!@!@!@!@!@!@!@!@!')
+            user = User.query.filter_by(email=submitted_user.email).first()
+            if submitted_user.password == user.password:
+                print('PASS!!!11!!!!!!!!!!!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@@!@!@!@!@!@!@!@!@!@!@!@!')
+                session['email'] = submitted_user.email
+                flash('Logged in')
+                #add user welcome
+                return render_template('newpost.html')
+    print('firstFAIL!!!11!!!!!!!!!!!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@@!@!@!@!@!@!@!@!@!@!@!@!')
+    submitted_user = None
+    print('secondFAIL!!!11!!!!!!!!!!!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@@!@!@!@!@!@!@!@!@!@!@!@!')
     return render_template('login.html')
 
 @app.route('/index')
