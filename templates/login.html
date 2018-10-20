@@ -2,19 +2,19 @@
 
 {% extends 'base.html' %}
 {% block login %}
-<form>
+<form action="/login" method="POST">
     <label>Username:</label>
     {% with html_username = get_flashed_messages(category_filter=['html_username']) %}
             <input type='text' name="html_user" value={{html_username[0]}}>
     {% endwith %}
-    {% with invalid_entry = get_flashed_messages(category_filter=['invalid_user'])%}
+    {% with invalid_entry = get_flashed_messages(category_filter=['user_exists'])%}
     {% if invalid_entry %}
-        <p class='inline error'>{{invalid_entry[0]}}</p>
+        <p class='inline error'>User does not exist. Create a new account <a href="/signup">here!</a></p>
     {% endif %}
     {% endwith %}
     <br>
     <label>Password:</label>
-    <input type="text" name="html_pw">
+    <input type="password" name="html_pw">
     {% with invalid_entry = get_flashed_messages(category_filter=['invalid_password'])%}
     {% if invalid_entry %}
         <p class='inline error'>{{invalid_entry[0]}}</p>
