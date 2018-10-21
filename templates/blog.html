@@ -2,20 +2,30 @@
 
 {% block blog %}
 
-<h1>Build a Blog</h1>
-<hr>
-{% if a_blog %}
+{% if user_view %}
+    <h1>Blog users!</h1>
+    <hr>
+    <ul>
+    {% for user in user_view %}
+        <li><a href="/blog?user={{ user.email }}">{{user.email}}</a></li>
+    {% endfor %}
+    </ul>
+
+{% elif users_post_view %}
+    <h1>{{ user }}'s posts</h1>
+    {% for entry in users_post_view %}
+        <h3><a href="/blog?id={{ entry.id }}">{{ entry.title }}</a></h3>
+        <p>{{ entry.body }}</p>
+        <p>written by {{user}}</p>
+        <hr>
+    {% endfor %} 
+
+{% elif a_blog %}
     <h3>{{ a_blog.title }}</h3>
     <p>{{ a_blog.body }}</p>
-{% elif blog_view %}
-    {% for entry in blog_view %}
-    <h3><a href="/blog?id={{ entry.id }}">{{ entry.title }}</a></h3>
-    <p>{{ entry.body }}</p>
-    <hr>
-    {% endfor %}
+ 
 {% else %}
     <p>No blog entries found :(</p>
-    <a href="/newpost">Click here to make your first blog :D</a>
 {% endif %}
 
 {% endblock %}
