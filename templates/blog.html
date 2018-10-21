@@ -20,6 +20,14 @@
         <hr>
     {% endfor %} 
 
+{% elif all_blogs_view %}
+    {% for entry in all_blogs_view %}
+        <h3><a href="/blog?id={{ entry.id }}">{{ entry.title }}</a></h3>
+        <p>{{ entry.body }}</p>
+        <p>written by {{entry.email}}</p>
+        <hr>
+{% endfor %} 
+
 {% elif a_blog %}
     <h3>{{ a_blog.title }}</h3>
     <p>{{ a_blog.body }}</p>
