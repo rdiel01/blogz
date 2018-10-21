@@ -24,16 +24,28 @@ class Blog(db.Model):
         self.body = body
         self.owner_id = owner
 
-    def not_blank(string):
+    def title_exists(self):
         """
         Blank field check
         ```
         Return False if string is empty
         """
-        if string or string.replace(' ','') != '':
+        if self.title or self.title.replace(' ','') != '':
             return True
         else:
-            return flash('The {0} field is empty','blog_error')
+            flash('The title field is empty','blog_title_error')
+
+    def body_exists(self):
+        """
+        Blank field check
+        ```
+        Return False if string is empty
+        """
+        if self.body or self.body.replace(' ','') != '':
+            return True
+        else:
+            flash('The body field is empty','blog_title_error')
+            
 
 
 class User(db.Model):
@@ -121,7 +133,6 @@ def signup():
             db.session.add(submitted_user)
             db.session.commit()
             session['email'] = submitted_user.email
-            print(session['email'])
             return render_template("newpost.html")
         elif submitted_user.valid_username() and not submitted_user.already_exists():            
             submitted_user = None
@@ -145,15 +156,13 @@ def login():
     submitted_user = None
     return render_template('login.html')
 
-@app.route('/index')
-def index():
-    pass
-
 @app.route('/logout')
 def logout():
+    print('LOGOUT!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!##!')
+    print(session)
     del session['email']
     #test the demo site to see where it is taking the user on logout
-    return redirect('/', code=301)
+    return redirect('/')
 
 @app.route('/')
 def all_blog_home():
@@ -171,7 +180,7 @@ def a_blog():
         users_posts = Blog.query.filter_by(owner_id=user.id).order_by(-Blog.id).all()
         #run a query filtering by the id
         return render_template('blog.html',users_post_view=users_posts,user=user.email)
-    if request.args.get('id'):
+    elif request.args.get('id'):
         #if id has an arg we need to display the single blog that the user selected
         blog_id=request.args.get('id')
         #assign the id argument to a variable
@@ -181,28 +190,28 @@ def a_blog():
         #render blog template with the blog object
     else:
         #if an id was not selected display all blogs in ascending order
-        blog_posts = Blog.query.order_by(-Blog.id).all()
+        #blog_posts = Blog.query.order_by(-Blog.id).all()
+        blog_posts = Blog.query.join(User).add_columns(User.email,Blog.title,Blog.body,Blog.id).order_by(-Blog.id).all()
         #run a query ordering by blog.id in reverse order (newest to oldest)
-        return render_template('blog.html',blog_view=blog_posts)
+        return render_template('blog.html',all_blogs_view=blog_posts)
         #render blog template with all blog objects
 
 @app.route('/newpost', methods=['GET','POST'])
 def add_new_post():
-    if request.method == 'POST':
-        blog_title = request.form['user_title']
+    if request.method == 'POST':       
         #assign the user's blog title to a variable
-        blog_body = request.form['user_body']
         #assign the user's blog body to a variable
-        if blank(blog_title) or blank(blog_body):
+        current_user = User.query.filter_by(email=session['email']).first()
+        submitted_blog = Blog(request.form['user_title'],request.form['user_body'],current_user.id)
+        if submitted_blog.title_exists and submitted_blog.body_exists:
             #if either the submitted blog title or body are blank
-            return render_template('newpost.html',blank_title=blank(blog_title),blank_body=blank(blog_body),previous_title=blog_title,previous_body=blog_body)
+            db.session.add(submitted_blog)
+            db.session.commit()
+            return render_template('blog.html',a_blog=submitted_blog)
             #render newpost template with error flags for jinja2 to evaluate
-        new_blog = Blog(blog_title,blog_body,1)
+        return render_template('newpost.html',previous_title=submitted_blog.title,previous_body=submitted_blog.body)
         #assign new object with blog title, blog body and user 1
-        db.session.add(new_blog)
-        db.session.commit()
-        blog_post = Blog.query.filter_by(title=blog_title).first()
-        return render_template('blog.html',a_blog=blog_post)
+        
 
     return render_template('newpost.html') 
 
