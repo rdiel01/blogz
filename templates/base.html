@@ -26,11 +26,14 @@
     <a href="/blog">all posts</a>
     <a href="/newpost">new post</a>
     <a href="/login">login</a>
-    <a href="/logout">logout</a>
-    </span>
     {% with message = session%}
-        {% if message %}
-            <p> {{ session['email']}} </p>
+        {% if message['email'] %}
+    <a href="/log_out">logout</a>
+        {% endif %}
+    </span>
+
+        {% if message['email'] %}
+                <p> Logged in as, {{message['email']}} </p>
         {% endif %}
     {% endwith %}
     {% block signup %}
