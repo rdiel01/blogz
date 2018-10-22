@@ -114,7 +114,7 @@ class User(db.Model):
 
 @app.before_request
 def require_login():
-    allowed_routes = ['login','signup','blog','index']
+    allowed_routes = ['login','signup','all_blog_home',]
     if request.endpoint not in allowed_routes and 'email' not in session:
         return redirect('/login')
 
@@ -156,10 +156,8 @@ def login():
     submitted_user = None
     return render_template('login.html')
 
-@app.route('/logout')
+@app.route('/log_out')
 def logout():
-    print('LOGOUT!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!##!')
-    print(session)
     del session['email']
     #test the demo site to see where it is taking the user on logout
     return redirect('/')
@@ -177,7 +175,7 @@ def a_blog():
         #if id has user as arg we need to display all the post of that user
         user=User.query.filter_by(email=request.args.get('user')).one()
         #assign the id argument to a variable
-        users_posts = Blog.query.filter_by(owner_id=user.id).order_by(-Blog.id).all()
+        users_posts = Blog.query.join(User).add_columns(User.email,User.id,Blog.title,Blog.body,Blog.id,Blog.owner_id).filter_by(email=user.email).order_by(-Blog.id).all()
         #run a query filtering by the id
         return render_template('blog.html',users_post_view=users_posts,user=user.email)
     elif request.args.get('id'):
@@ -214,12 +212,6 @@ def add_new_post():
         
 
     return render_template('newpost.html') 
-
-@app.route('/test')
-def tests():
-    test_user = User
-    return render_template('test.html')
-
 
 if __name__ == '__main__':
     app.run()
