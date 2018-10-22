@@ -16,7 +16,7 @@
     {% for entry in users_post_view %}
         <h3><a href="/blog?id={{ entry.id }}">{{ entry.title }}</a></h3>
         <p>{{ entry.body }}</p>
-        <p>written by {{user}}</p>
+        <p>written by <a href="/blog?user={{entry.email}}"/> {{entry.email}} </p>
         <hr>
     {% endfor %} 
 
@@ -24,7 +24,7 @@
     {% for entry in all_blogs_view %}
         <h3><a href="/blog?id={{ entry.id }}">{{ entry.title }}</a></h3>
         <p>{{ entry.body }}</p>
-        <p>written by {{entry.email}}</p>
+        <p>written by <a href="/blog?user={{entry.email}}"/> {{entry.email}} </p>
         <hr>
 {% endfor %} 
 
