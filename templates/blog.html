@@ -31,6 +31,7 @@
 {% elif a_blog %}
     <h3>{{ a_blog.title }}</h3>
     <p>{{ a_blog.body }}</p>
+    <p>written by <a href="/blog?user={{a_blog.owner.email}}"/> {{a_blog.owner.email}} </p>
  
 {% else %}
     <p>No blog entries found :(</p>
