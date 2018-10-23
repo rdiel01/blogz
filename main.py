@@ -135,7 +135,7 @@ def signup():
             db.session.add(submitted_user)
             db.session.commit()
             session['email'] = submitted_user.email
-            return render_template("newpost.html")
+            return render_template("users.html")
         elif submitted_user.valid_username() and not submitted_user.already_exists():            
             submitted_user = None
             return render_template("signup.html")
@@ -154,7 +154,7 @@ def login():
                 session['email'] = submitted_user.email
                 flash('Logged in as {0}.'.format(submitted_user.email),'login_good')
                 submitted_user=None
-                return render_template('newpost.html')
+                return redirect('/')
     submitted_user = None
     return render_template('login.html')
 
