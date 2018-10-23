@@ -15,7 +15,7 @@
     <br>
     <label>Password:</label>
     <input type="password" name="html_pw">
-    {% with invalid_entry = get_flashed_messages(category_filter=['invalid_password'])%}
+    {% with invalid_entry = get_flashed_messages(category_filter=['wrong_password'])%}
     {% if invalid_entry %}
         <p class='inline error'>{{invalid_entry[0]}}</p>
     {% endif %}
