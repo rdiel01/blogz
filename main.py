@@ -1,16 +1,13 @@
 from flask import Flask, request, redirect, render_template, session, flash
 from flask_sqlalchemy import SQLAlchemy
+from hashutils import make_pw_hash, check_pw_hash
 
 app = Flask(__name__)
-app.secret_key = 'dakey'
 app.config['DEBUG'] = True
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://build-a-blog:**B1r2y3B$$@localhost:8889/build-a-blog'
 app.config['SQLALCHEMY_ECHO'] = True
 db = SQLAlchemy(app)
-
-#TODO:add a singleUser.html template that will be used to display only the blogs associated with a single given author.
-    #It will be used when we dynamically generate a page using a GET request with a user query parameter on the /blog route
-#TODO: We'll have a logout function that handles a POST request to /logout and redirects the user to /blog after deleting the username from the session
+app.secret_key = '33ervvf5$$588*2addltifIIMHdHhh%3##$duuUmw@sd'
 
 class Blog(db.Model):
 
@@ -58,6 +55,10 @@ class User(db.Model):
     def __init__(self, email, password):
         self.email = email
         self.password = password
+
+    def validate(self, verify_pass):
+        if self.already_exists() and self.valid_username() and self.valid_password() and self.matching_passwords(verify_pass):
+            return True
 
     def valid_username(self):
         """
@@ -108,7 +109,7 @@ class User(db.Model):
             return True
         else:
             flash(self.email,'html_username')
-            flash ('Incorrect password.','invalid_password')
+            flash ('Incorrect password.','wrong_password')
             flash('Passwords do not match','different_passwords')
             return False
 
@@ -130,6 +131,7 @@ def signup():
         submitted_user = User(request.form['typed_username'],request.form['pass1'])
 
         if  submitted_user.valid_password() and not submitted_user.already_exists() and submitted_user.valid_username() and submitted_user.matching_passwords(request.form['pass2']):
+        #if submitted_user.validate(request.form['pass2']):
             db.session.add(submitted_user)
             db.session.commit()
             session['email'] = submitted_user.email
@@ -158,8 +160,8 @@ def login():
 
 @app.route('/log_out')
 def logout():
+    print('!##!#!#!#!#!#!##!#!#!#!#!#!#!##!#!#!#!#!#!##!#!#!#!#!#')
     del session['email']
-    #test the demo site to see where it is taking the user on logout
     return redirect('/')
 
 @app.route('/')
